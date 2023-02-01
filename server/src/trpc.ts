@@ -1,0 +1,78 @@
+// @filename: trpc.ts
+import * as trpcExpress from "@trpc/server/adapters/express";
+import jwt from "jsonwebtoken";
+import { inferAsyncReturnType, initTRPC, TRPCError } from "@trpc/server";
+import { db } from "src/db";
+import { z } from "zod";
+import { RoleEnum } from "Src/utils";
+import { User } from "@prisma/client";
+// created for each request
+export const createContext = ({
+  req,
+}: trpcExpress.CreateExpressContextOptions): {
+  authorization: string;
+  user?: User;
+} => {
+  const { authorization } = req.headers;
+
+  return { authorization: authorization as string };
+}; // no context
+type Context = inferAsyncReturnType<typeof createContext>;
+const t = initTRPC.context<Context>().create();
+
+export const middleware = t.middleware;
+
+export const router = t.router;
+export const publicProcedure = t.procedure;
+
+const isAuth = t.middleware(async ({ ctx, next }) => {
+  if (!ctx.authorization) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+  const token = ctx.authorization.split(" ")[1];
+  console.log(ctx);
+  // console.log(token);
+
+  const payload = jwt.verify(token, "thisShouldBeMovedToDotEnvLater") as {
+    id: string;
+  };
+  const user = await db.user.findUnique({ where: { id: payload.id } });
+
+  if (!user) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "This user doesn't exist",
+    });
+  }
+
+  return next({
+    ctx: { ...ctx, user },
+  });
+});
+
+const isAdminOrMod = t.middleware(async ({ ctx, next }) => {
+  if (
+    !((ctx.user?.role as z.infer<typeof RoleEnum>) == "Moderator") ||
+    !((ctx.user?.role as z.infer<typeof RoleEnum>) == "Admin")
+  ) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "this route is only for admins and mods",
+    });
+  }
+  return next();
+});
+
+const isAdmin = t.middleware(async ({ ctx, next }) => {
+  if (!((ctx.user?.role as z.infer<typeof RoleEnum>) == "Admin")) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "this route is only for admins",
+    });
+  }
+  return next();
+});
+
+export const adminProcedure = t.procedure.use(isAuth);
+
+export const privateProcedure = t.procedure.use(isAuth);

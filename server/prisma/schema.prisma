@@ -1,0 +1,126 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+generator zod {
+  provider = "npx prisma-zod-generator"
+ output= "../generated"
+}
+
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+    id           String   @id @default(uuid())
+    role      String @default("Customer")
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+    email     String   @unique
+    fullName     String   
+    passwordHash String?
+     userAddress      UserAddress?
+    userAddressId        String?
+    products Product[]
+    cartItems Cart[]
+    orders Order[]
+    reviews Review[]
+}
+
+model Cart {
+    id              String @id @default(uuid())
+    creator      User? @relation(fields: [creatorId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+    creatorId        String?
+    product      Product? @relation(fields: [productId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+    productId        String?
+    varient      Varient? @relation(fields: [varientId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+    varientId        String?
+    price Decimal?
+}
+
+model Product {
+    id            String   @id @default(uuid())
+    creator       User? @relation(fields: [creatorId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+    creatorId     String?
+    category      Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    categoryId    String?
+    previewImage  String?
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+    title          String @unique
+    quantityLeft  Int 
+    note          String
+    varients      Varient[]
+    cart   Cart[]
+    price Int
+    orders  Order[]
+    reviews Review[]
+}
+model Varient {
+    id              String @id @default(uuid())
+    title String 
+    product         Product? @relation(fields: [productId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+    productId       String?
+    previewImage    String?
+    orders  Order[]
+    carts Cart[]
+}
+
+model Review {
+    id              String @id @default(uuid())
+    creator      User? @relation(fields: [creatorId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+    creatorId        String?
+    product      Product? @relation(fields: [productId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+    productId        String?
+    note  String
+    rating Decimal
+    @@unique([creatorId, productId])
+}
+
+
+
+model Order {
+    id              String @id @default(uuid())
+    quality Int @default(1)
+    price Int 
+    creator      User? @relation(fields: [creatorId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+    creatorId        String?
+    product         Product? @relation(fields: [productId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+    productId       String?
+    varient         Varient? @relation(fields: [varientId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+    varientId       String?
+}
+
+model Category {
+    title   String
+    id         String   @id @default(uuid())
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt 
+    products   Product[]
+}
+
+model Coupon {
+    id String @id @default(uuid())
+    token      String   @unique
+    expires    DateTime
+}
+
+model UserAddress {
+    id String @id @default(uuid())
+      user  User? @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    userId        String? @unique
+    homeIdNumber String? 
+    closestLandmark String
+    street String
+    lga String 
+    postalCode String
+    town String
+    note String
+}
+
+

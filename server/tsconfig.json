@@ -1,40 +1,31 @@
 {
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx"
-  ],
-  "exclude": [ 
-    "node_modules",
-    "**/*.spec.ts"
-  ],
   "compilerOptions": {
-    "outDir": "./build/",
-    "allowSyntheticDefaultImports": false,           
-    "target": "es2017",
-    "downlevelIteration": true,
-    "importHelpers": true,                           
+    "target": "es6",
+    "module": "commonjs",
+    "lib": ["dom", "es6", "es2017", "esnext.asynciterable"],
+    "skipLibCheck": true,
     "sourceMap": true,
-    "module": "commonjs",                              
+    "outDir": "./dist",
     "moduleResolution": "node",
-    "esModuleInterop": false,
-    "jsx": "preserve",
-    "allowJs": false,
-    "checkJs": false,
-    "lib": [ 
-      "es2017"
-    ],
-    "forceConsistentCasingInFileNames": true,
-    "experimentalDecorators": true,
+    "removeComments": true,
     "noImplicitAny": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
     "noImplicitThis": true,
     "noUnusedLocals": true,
-    "skipLibCheck": true,
-    "strictNullChecks": true,
-	  "strictPropertyInitialization": true,
-    "suppressImplicitAnyIndexErrors": false,
-    "removeComments": true,
-    "typeRoots" : ["./node_modules/@types"]         
-  }
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "schemas/": ["generated/schemas/"]
+    }
+  },
+  "include": ["src/**/*", "prisma/seed.ts", "generated/schemas/"],
+  "exclude": ["dist/", "node_moules"]
 }
