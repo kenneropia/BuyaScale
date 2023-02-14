@@ -8,8 +8,7 @@ import {
   randProductDescription,
   randProductMaterial,
 } from "@ngneat/falso";
-import { Category, PrismaClient } from "@prisma/client";
-import { PrismaClientOptions } from "@prisma/client/runtime";
+import { Category } from "@prisma/client";
 import { db } from "../src/db";
 
 const run = async () => {
@@ -38,7 +37,7 @@ const run = async () => {
     return user;
   });
 
-  const seedUser = await seedTable(0, async () => {
+  await seedTable(0, async () => {
     return await db.user.create({
       data: {
         email: randEmail(),
@@ -74,8 +73,8 @@ const run = async () => {
     });
   });
 
-  const seedVarient = seedTable(0, async () => {
-    const randdomUser = () => rand(seedAdmin.map((item) => item.id));
+  seedTable(0, async () => {
+    // const randdomUser = () => rand(seedAdmin.map((item) => item.id));
     const randdomProductFromDB = () => rand(seedProduct.map((item) => item.id));
 
     return await db.varient.create({

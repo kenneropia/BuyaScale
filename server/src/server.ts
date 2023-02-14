@@ -1,6 +1,10 @@
+import * as dotenv from "dotenv"; // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
+dotenv.config();
+// import "./utils/declarations";
 import * as trpcExpress from "@trpc/server/adapters/express";
 import { renderTrpcPanel } from "trpc-panel";
 import { z } from "zod";
+import cors from "cors";
 import { writeFile } from "fs/promises";
 import morgan from "morgan";
 import express from "express";
@@ -12,11 +16,16 @@ import { appRouter } from "./app";
 import { createContext } from "./trpc";
 import { db } from "./db";
 import path from "path";
-import { uploadBody } from "./utils";
+import { uploadBody } from "./utils/others";
+import hookRouter from "./utils/hook";
 const app = express();
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+
+app.use(cors());
+
+app.use(hookRouter);
 
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
@@ -92,10 +101,6 @@ app.use(
     createContext,
   })
 );
-
-app.get("/get", (_, res) => {
-  return res.json({ get: "lol" });
-});
 
 const PORT = process.env.PORT || 4000;
 

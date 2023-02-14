@@ -4,7 +4,7 @@ import { db } from "src/db";
 import { TRPCError } from "@trpc/server";
 
 import { userAddressSchema, userSchema } from "./user.schema";
-import { createToken, isCorrect } from "src/utils";
+import { createToken, isCorrect } from "src/utils/others";
 
 export const userRouter = router({
   signup: publicProcedure
@@ -28,7 +28,7 @@ export const userRouter = router({
           passwordHash: input.password,
         },
       });
-      console.log(email);
+
       const token = createToken({ id, email });
       return { email, fullName, id, token };
     }),
@@ -63,12 +63,13 @@ export const userRouter = router({
       return { ...user, token, id: null };
     }),
   profile: privateProcedure.query(async ({ ctx }) => {
-    const userAddress = await db.userAddress.findFirst({
+    const user = await db.user.findFirst({
       where: {
-        userId: ctx.user.id,
+        id: ctx.user.id,
       },
+      include: { userAddress: true },
     });
-    return { user: ctx.user, userAddress };
+    return { user };
   }),
   updateUserAddress: privateProcedure
     .input(userAddressSchema)

@@ -4,21 +4,26 @@ import jwt from "jsonwebtoken";
 import { inferAsyncReturnType, initTRPC, TRPCError } from "@trpc/server";
 import { db } from "src/db";
 import { z } from "zod";
-import { RoleEnum } from "Src/utils";
+import { RoleEnum } from "src/utils/others";
 import { User } from "@prisma/client";
+import {
+  PrismaClientKnownRequestError,
+  PrismaClientValidationError,
+} from "@prisma/client/runtime";
 // created for each request
 export const createContext = ({
   req,
 }: trpcExpress.CreateExpressContextOptions): {
   authorization: string;
   user?: User;
+  isAdmin?: boolean;
 } => {
   const { authorization } = req.headers;
 
   return { authorization: authorization as string };
 }; // no context
 type Context = inferAsyncReturnType<typeof createContext>;
-const t = initTRPC.context<Context>().create();
+const t = initTRPC.context<Context>().create({});
 
 export const middleware = t.middleware;
 
@@ -30,7 +35,7 @@ const isAuth = t.middleware(async ({ ctx, next }) => {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   const token = ctx.authorization.split(" ")[1];
-  console.log(ctx);
+
   // console.log(token);
 
   const payload = jwt.verify(token, "thisShouldBeMovedToDotEnvLater") as {
@@ -44,17 +49,15 @@ const isAuth = t.middleware(async ({ ctx, next }) => {
       message: "This user doesn't exist",
     });
   }
-
+  const isAdminBol = RoleEnum.safeParse(ctx.user?.role).success;
   return next({
-    ctx: { ...ctx, user },
+    ctx: { ...ctx, user, isAdmin: isAdminBol },
   });
 });
 
 const isAdminOrMod = t.middleware(async ({ ctx, next }) => {
-  if (
-    !((ctx.user?.role as z.infer<typeof RoleEnum>) == "Moderator") ||
-    !((ctx.user?.role as z.infer<typeof RoleEnum>) == "Admin")
-  ) {
+  console.log(ctx.user);
+  if (!RoleEnum.safeParse(ctx.user?.role).success) {
     throw new TRPCError({
       code: "UNAUTHORIZED",
       message: "this route is only for admins and mods",
@@ -73,6 +76,6 @@ const isAdmin = t.middleware(async ({ ctx, next }) => {
   return next();
 });
 
-export const adminProcedure = t.procedure.use(isAuth);
+export const adminProcedure = t.procedure.use(isAuth).use(isAdminOrMod);
 
 export const privateProcedure = t.procedure.use(isAuth);

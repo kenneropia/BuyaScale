@@ -1,10 +1,36 @@
-import { router, publicProcedure, privateProcedure } from "src/trpc";
+import {
+  router,
+  publicProcedure,
+  privateProcedure,
+  adminProcedure,
+} from "src/trpc";
 import { z } from "zod";
 import { db } from "src/db";
 
-import { LimitAndPage, transformEnumToTruple } from "src/utils";
+import { LimitAndPage } from "src/utils/others";
+import deleteFile from "src/utils/deleteFile";
+import { createProductSchema } from "./product.schema";
 
 export const productRouter = router({
+  createProductByAdmin: adminProcedure
+    .input(createProductSchema)
+    .mutation(async ({ input }) => {
+      return await db.product.create({ data: { ...input } });
+    }),
+  createVarientByAdmin: adminProcedure
+    .input(
+      createProductSchema
+        .omit({
+          quantityLeft: true,
+          categoryId: true,
+          createrId: true,
+          note: true,
+        })
+        .merge(z.object({ productId: z.string().uuid() }))
+    )
+    .mutation(async ({ input }) => {
+      return await db.varient.create({ data: { ...input } });
+    }),
   productById: publicProcedure
     .input(z.string().uuid())
     .query(async ({ input }) => {
@@ -26,4 +52,18 @@ export const productRouter = router({
       }),
     };
   }),
+  deleteProductByAdmin: adminProcedure
+    .input(z.string().uuid())
+    .mutation(async ({ input }) => {
+      const product = await db.product.delete({ where: { id: input } });
+      deleteFile(product.previewImage);
+      return Boolean(product);
+    }),
+  deleteVarientByAdmin: adminProcedure
+    .input(z.string().uuid())
+    .mutation(async ({ input }) => {
+      const varient = await db.varient.delete({ where: { id: input } });
+      deleteFile(varient.previewImage);
+      return Boolean(varient);
+    }),
 });
