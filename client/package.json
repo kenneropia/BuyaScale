@@ -25,22 +25,9 @@
     "semantic-ui"
   ],
   "scripts": {
-    "build": "webpack",
-    "postbuild": "yarn prettier",
-    "build:prod": "webpack --env prod",
-    "postbuild:prod": "cross-env TS_NODE_PROJECT=tsconfig.ssr.json node -r ts-node/register -r tsconfig-paths/register src/utils/postprocess/postProcess.ts && yarn prettier",
-    "compile": "tsc -p .",
-    "lint": "eslint . --ext .ts,.tsx",
-    "dev": "webpack serve --config webpack.config.js",
-    "test": "cross-env NODE_ENV=test jest",
-    "build:prod-debug": "webpack --env.prod",
-    "postbuild:prod-debug": "yarn copy",
-    "precopy": "rimraf ../server/build/client && mkdirp ../server/build/client",
-    "copy": "copyfiles -f dist/* ../server/build/client/",
-    "prettier": "prettier --no-config --write ./dist/*.html",
-    "build:jamstack": "webpack --env prod --env jamstack",
-    "postbuild:jamstack": "yarn postbuild:prod",
-    "benchmark:SSR": "cross-env TS_NODE_PROJECT=tsconfig.ssr.json node -r ts-node/register -r tsconfig-paths/register src/utils/postprocess/postProcess.ts"
+    "dev": "npx vite",
+    "tailwind": "npx tailwind -i ./src/tailwind.css -o ./src/styles.css --watch",
+    "dev:together": "npm-run-all -p tailwind dev"
   },
   "dependencies": {
     "@tanstack/react-query": "^4.22.4",
@@ -48,10 +35,14 @@
     "@trpc/react-query": "^10.9.0",
     "@trpc/server": "^10.9.0",
     "@vitejs/plugin-react-swc": "^3.0.1",
+    "npm-run-all": "^4.1.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-helmet-async": "^1.3.0",
+    "react-icons": "^4.7.1",
     "react-router-dom": "^6.7.0",
-    "vite": "^4.0.4",
+    "react-uuid": "^2.0.0",
+    "vite": "^4.1.1",
     "zod": "^3.20.2"
   },
   "devDependencies": {

@@ -59,7 +59,7 @@ app.post(
             previewImage: `/uploads/${body.id}.${file?.mimetype.split("/")[1]}`,
           },
         })
-        .then(async (data) => {
+        .then(async (data: any) => {
           data &&
             writeFile(
               `./uploads/${body.id}.${file?.mimetype.split("/")[1]}`,
@@ -74,7 +74,7 @@ app.post(
             previewImage: `/uploads/${body.id}.${file?.mimetype.split("/")[1]}`,
           },
         })
-        .then(async (data) => {
+        .then(async (data: any) => {
           data &&
             writeFile(
               `./uploads/${body.id}.${file?.mimetype.split("/")[1]}`,

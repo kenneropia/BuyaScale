@@ -33,8 +33,8 @@
     "./server/*"
   ],
   "scripts": {
-    "install": "cd client && yarn",
-    "postinstall": "cd server && yarn",
+    "install": "cd client && yarn install",
+    "postinstall": "cd server && yarn install",
     "pretest": "cd client && yarn build",
     "test": "cd client && yarn test",
     "posttest": "cd server && yarn copy && yarn test",
@@ -53,5 +53,4 @@
   "engines": {
     "node": ">=12.22.5"
   }
- 
 }
