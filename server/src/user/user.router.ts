@@ -41,13 +41,13 @@ export const userRouter = router({
     )
     .output(userSchema)
     .mutation(async ({ input }) => {
-      let user = await db.user.findFirst({
+      let user = await db.user.findFirstOrThrow({
         select: { email: true, fullName: true, id: true, passwordHash: true },
-        where: { email: input.email },
+        where: { email: input.email, lol: "lol", ok: "ok" },
       });
       if (!user) {
         throw new TRPCError({
-          code: "NOT_FOUND",
+          code: "UNAUTHORIZED",
           message: "wrong details",
         });
       }

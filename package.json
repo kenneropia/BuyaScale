@@ -2,15 +2,15 @@
   "name": "crisp-react",
   "version": "1.4.0",
   "description": "Boilerplate project with React client and Express backend, both written in Typescript.",
-  "author": "winwiz1 <winwiz@gmail.com> (https://github.com/winwiz1/)",
+  "author": "winwiz1 <winwiz@gmail.com> (https://github.com/kenneropia/)",
   "contributors": [
-    "winwiz1 <winwiz@gmail.com> (https://github.com/winwiz1/)"
+    "kenneropia <adetunmbikenny@gmail.com> (https://github.com/kenneropia/)"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/winwiz1/crisp-react/",
+  "homepage": "https://github.com/kenneropia/BuyaScale/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/winwiz1/crisp-react.git"
+    "url": "https://github.com/kenneropia/BuyaScale.git"
   },
   "keywords": [
     "react",
@@ -22,36 +22,16 @@
     "webpack",
     "webpack-dev-server",
     "typestyle",
-    "react-testing-library",
-    "supertest",
-    "jest",
-    "semantic-ui",
-    "boilerplate"
+    "react-testing-library"
   ],
   "files": [
     "./client/*",
     "./server/*"
   ],
   "scripts": {
-    "install": "cd client && yarn",
-    "postinstall": "cd server && yarn",
-    "pretest": "cd client && yarn build",
-    "test": "cd client && yarn test",
-    "posttest": "cd server && yarn copy && yarn test",
-    "compile": "cd client && yarn compile",
-    "postcompile": "cd server && yarn compile",
-    "build": "cd client && yarn build",
-    "postbuild": "cd server && yarn prestart",
-    "build:prod": "cd client && yarn build:prod",
-    "postbuild:prod": "cd server && yarn prestart",
-    "start:prod": "cd client && yarn build:prod",
-    "poststart:prod": "cd server && yarn start:prod",
-    "run:prod": "cd server && yarn run:prod",
-    "build:jamstack": "cd client && yarn && yarn build:jamstack",
-    "benchmark:SSR": "cd client && yarn benchmark:SSR"
+    "install": "cd client && yarn"
   },
   "engines": {
     "node": ">=12.22.5"
   }
- 
 }

@@ -5,7 +5,7 @@ import { inferAsyncReturnType, initTRPC, TRPCError } from "@trpc/server";
 import { db } from "src/db";
 import { z } from "zod";
 import { RoleEnum } from "src/utils/others";
-import { User } from "@prisma/client";
+import { Prisma, User } from "@prisma/client";
 import {
   PrismaClientKnownRequestError,
   PrismaClientValidationError,
@@ -23,7 +23,26 @@ export const createContext = ({
   return { authorization: authorization as string };
 }; // no context
 type Context = inferAsyncReturnType<typeof createContext>;
-const t = initTRPC.context<Context>().create({});
+const t = initTRPC.context<Context>().create({
+  errorFormatter({ shape, error }) {
+    // P2022: Unique constraint failed
+    // Prisma error codes: https://www.prisma.io/docs/reference/api-reference/error-reference#error-codes
+
+    if (shape.code === "P2002" || shape.code === -32603) {
+      console.log({
+        message: error.message,
+        code: "BAD_REQUEST",
+        data: { ...shape.data, httpStatus: 400, code: 400 },
+      });
+      return {
+        message: error.message,
+        code: "BAD_REQUEST",
+        data: { ...shape.data, httpStatus: 400, code: 400 },
+      };
+    }
+    return shape;
+  },
+});
 
 export const middleware = t.middleware;
 
